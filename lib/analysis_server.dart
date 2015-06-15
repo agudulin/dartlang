@@ -11,6 +11,7 @@ import 'process.dart' as process;
 
 
 import 'dart:async';
+import 'dart:convert';
 import 'package:logging/logging.dart';
 import 'package:analysis_server/src/protocol.dart';
 import 'state.dart' as state;
@@ -199,7 +200,7 @@ class _Server {
   /**
    * Server process object, or null if server hasn't been started yet.
    */
-  io.Process _process;
+  var _process;
 
   /**
    * Commands that have been sent to the server but not yet acknowledged, and
@@ -346,7 +347,7 @@ class _Server {
     Completer completer = new Completer();
     _pendingCommands[id] = completer;
     String line = JSON.encode(command);
-    _logStdio('SEND: $line');
+    print('SEND: $line');
     _process.stdin.add(UTF8.encoder.convert("${line}\n"));
     return completer.future;
   }
@@ -357,7 +358,7 @@ class _Server {
    * `true`, the server will be started with "--observe" and
    * "--pause-isolates-on-exit", allowing the observatory to be used.
    */
-  Future start({bool debugServer: false, bool profileServer: false}) {
+  Future start({bool debugServer: false, bool profileServer: false}) async {
     if (_process != null) throw new Exception('Process already started');
 
     _time.start();
@@ -392,7 +393,16 @@ class _Server {
     print("Arguments: $arguments");
 
     var procRunner = new process.ProcessRunner(dartBinary, args: arguments);
+
     var exitCode = procRunner.execStreaming();
+
+    while (!procRunner.started) {
+      await new Future.delayed(new Duration(seconds: 0));
+    }
+    _process = procRunner;
+
+    print ("procRunner.started: ${procRunner.started}");
+    print ("${_process.stdout == null}");
 
     exitCode.then((int code) {
       print ("Analysis Server exitted wtih $code");
