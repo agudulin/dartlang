@@ -5,12 +5,27 @@ homepage: https://github.com/dart-atom/dartlang
 environment:
   sdk: '>=1.0.0 <2.0.0'
 dependencies:
-  frappe: ^0.4.0
+  frappe:
+    git:
+      url: https://github.com/radicaled/frappe.git
+      ref: fix_type_problems
   logging: ^0.11.0
-  markdown: ^0.7.0
+  markdown:
+    git:
+      url: https://github.com/radicaled/dart-markdown.git
+      ref: fix_type_problems
   semver: ^0.2.0
+  stream_transformers:
+    git:
+      url: https://github.com/radicaled/stream_transformers.git
+      ref: fix_type_problems
 dev_dependencies:
   grinder: ^0.7.0
   html: ^0.12.0
   pub_semver: ^1.2.1
   test: ^0.12.0
+dependency_overrides:
+  stream_transformers:
+    git:
+      url: https://github.com/radicaled/stream_transformers.git
+      ref: fix_type_problems
